@@ -46,4 +46,22 @@ class Machine {
     }
   }
 
+  bool isAvailableResources() {
+    return _coffeeBeans >= 50 && _water >= 100;
+  }
+
+  void _subtractResources() {
+    _coffeeBeans -= 50;
+    _water -= 100;
+    _cash += 150;
+  }
+
+  bool makingCoffee() {
+    if (isAvailableResources()) {
+      _subtractResources();
+      return true;
+    }
+    return false;
+  }
+
 }
