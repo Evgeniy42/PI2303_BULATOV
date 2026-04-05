@@ -1,5 +1,6 @@
 import 'Resources.dart';
 import 'ICoffee.dart';
+import 'CoffeeMaker.dart';
 import '../enums/CoffeeTypes.dart';
 import 'Coffee.dart';
 
@@ -28,25 +29,30 @@ class Machine {
     print('Добавлено $amount $resourceType');
   }
 
-  void makeCoffeeByType(CoffeeType type) {
+  Future<void> makeCoffeeByType(CoffeeType type) async {
     ICoffee coffee;
+    bool hasMilk;
     
     switch (type) {
       case CoffeeType.espresso:
         coffee = Espresso();
+        hasMilk = false;
         break;
       case CoffeeType.cappuccino:
         coffee = Cappuccino();
+        hasMilk = true;
         break;
       case CoffeeType.latte:
         coffee = Latte();
+        hasMilk = true;
         break;
       case CoffeeType.americano:
         coffee = Americano();
+        hasMilk = false;
         break;
     }
     
-    makeCoffee(coffee);
+    await makeCoffee(coffee, hasMilk);
   }
 
   bool isAvailableResources(ICoffee coffee) {
@@ -55,18 +61,24 @@ class Machine {
            resources.water >= coffee.water();
   }
 
-  void makeCoffee(ICoffee coffee) {
+  Future<void> makeCoffee(ICoffee coffee, bool hasMilk) async {
     if (isAvailableResources(coffee)) {
+      print('\nРесурсы для приготовления:');
+      print('  - Кофе: ${coffee.coffeeBeans()} гр');
+      print('  - Молоко: ${coffee.milk()} мл');
+      print('  - Вода: ${coffee.water()} мл');
+      print('  - Стоимость: ${coffee.cash()} руб');
+      
+      await CoffeeMaker.prepareCoffee(hasMilk);
+      
       resources.coffeeBeans -= coffee.coffeeBeans();
       resources.milk -= coffee.milk();
       resources.water -= coffee.water();
       resources.cash += coffee.cash();
       
-      print('Кофе готов!');
-      print('Списано: ${coffee.coffeeBeans()} гр кофе, ${coffee.milk()} мл молока, ${coffee.water()} мл воды');
-      print('Добавлено: ${coffee.cash()} руб');
+      print('С вашего счета списано: ${coffee.cash()} руб\n');
     } else {
-      print('Недостаточно ресурсов!');
+      print('\nНедостаточно ресурсов!');
       print('Требуется:');
       print('  - Кофе: ${coffee.coffeeBeans()} гр (доступно: ${resources.coffeeBeans} гр)');
       print('  - Молоко: ${coffee.milk()} мл (доступно: ${resources.milk} мл)');
