@@ -1,67 +1,85 @@
+import 'Resources.dart';
+import 'ICoffee.dart';
+import '../enums/CoffeeTypes.dart';
+import 'Coffee.dart';
+
 class Machine {
-
-  int _coffeeBeans = 0;
-  int _milk = 0;
-  int _water = 0;
-  double _cash = 0.0;
-
+  Resources resources;
+  
   Machine({
-    int coffeeBeans = 0,
-    int milk = 0,
-    int water = 0,
-    double cash = 0.0,
-  }) {
-    _coffeeBeans = coffeeBeans;
-    _milk = milk;
-    _water = water;
-    _cash = cash;
+    Resources? resources,
+  }) : resources = resources ?? Resources();
+
+  void fillResources(String resourceType, int amount) {
+    switch (resourceType.toLowerCase()) {
+      case 'coffeebeans':
+        resources.coffeeBeans += amount;
+        break;
+      case 'milk':
+        resources.milk += amount;
+        break;
+      case 'water':
+        resources.water += amount;
+        break;
+      default:
+        print('Неизвестный тип ресурса');
+        return;
+    }
+    print('Добавлено $amount $resourceType');
   }
 
-  int get coffeeBeans => _coffeeBeans;
-  int get milk => _milk;
-  int get water => _water;
-  double get cash => _cash;
+  void makeCoffeeByType(CoffeeType type) {
+    ICoffee coffee;
+    
+    switch (type) {
+      case CoffeeType.espresso:
+        coffee = Espresso();
+        break;
+      case CoffeeType.cappuccino:
+        coffee = Cappuccino();
+        break;
+      case CoffeeType.latte:
+        coffee = Latte();
+        break;
+      case CoffeeType.americano:
+        coffee = Americano();
+        break;
+    }
+    
+    makeCoffee(coffee);
+  }
 
-  set coffeeBeans(int value) {
-    if (value >= 0) {
-      _coffeeBeans = value;
+  bool isAvailableResources(ICoffee coffee) {
+    return resources.coffeeBeans >= coffee.coffeeBeans() &&
+           resources.milk >= coffee.milk() &&
+           resources.water >= coffee.water();
+  }
+
+  void makeCoffee(ICoffee coffee) {
+    if (isAvailableResources(coffee)) {
+      resources.coffeeBeans -= coffee.coffeeBeans();
+      resources.milk -= coffee.milk();
+      resources.water -= coffee.water();
+      resources.cash += coffee.cash();
+      
+      print('Кофе готов!');
+      print('Списано: ${coffee.coffeeBeans()} гр кофе, ${coffee.milk()} мл молока, ${coffee.water()} мл воды');
+      print('Добавлено: ${coffee.cash()} руб');
+    } else {
+      print('Недостаточно ресурсов!');
+      print('Требуется:');
+      print('  - Кофе: ${coffee.coffeeBeans()} гр (доступно: ${resources.coffeeBeans} гр)');
+      print('  - Молоко: ${coffee.milk()} мл (доступно: ${resources.milk} мл)');
+      print('  - Вода: ${coffee.water()} мл (доступно: ${resources.water} мл)');
     }
   }
 
-  set milk(int value) {
-    if (value >= 0) {
-      _milk = value;
-    }
+  void showResources() {
+    print('\n--- Текущие ресурсы машины ---');
+    print('Кофе: ${resources.coffeeBeans} гр');
+    print('Молоко: ${resources.milk} мл');
+    print('Вода: ${resources.water} мл');
+    print('Деньги: ${resources.cash} руб');
+    print('--------------------------------');
   }
-
-  set water(int value) {
-    if (value >= 0) {
-      _water = value;
-    }
-  }
-
-  set cash(double value) {
-    if (value >= 0) {
-      _cash = value;
-    }
-  }
-
-  bool isAvailableResources() {
-    return _coffeeBeans >= 50 && _water >= 100;
-  }
-
-  void _subtractResources() {
-    _coffeeBeans -= 50;
-    _water -= 100;
-    _cash += 150;
-  }
-
-  bool makingCoffee() {
-    if (isAvailableResources()) {
-      _subtractResources();
-      return true;
-    }
-    return false;
-  }
-
 }
