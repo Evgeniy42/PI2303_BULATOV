@@ -3,7 +3,7 @@ import 'classes/Machine.dart';
 import 'classes/Resources.dart';
 import 'enums/CoffeeTypes.dart';
 
-void main() {
+void main() async {
   Resources resources = Resources(
     coffeeBeans: 100,
     milk: 200,
@@ -31,11 +31,11 @@ void main() {
         break;
         
       case 'add':
-        _fillResources(machine);
+        await _fillResources(machine);
         break;
         
       case 'make':
-        _makeCoffee(machine);
+        await _makeCoffee(machine);
         break;
         
       case 'exit':
@@ -43,12 +43,12 @@ void main() {
         return;
         
       default:
-        print('Неизвестная команда. Используйте: resources, fill, make, exit');
+        print('Неизвестная команда. Используйте: resources, add, make, exit');
     }
   }
 }
 
-void _fillResources(Machine machine) {
+Future<void> _fillResources(Machine machine) async {
   print('\nКакой ресурс добавить?');
   print('  1 - кофе');
   print('  2 - молоко');
@@ -85,12 +85,12 @@ void _fillResources(Machine machine) {
   machine.showResources();
 }
 
-void _makeCoffee(Machine machine) {
+Future<void> _makeCoffee(Machine machine) async {
   print('\nВыберите вид кофе:');
-  print('  1 - Эспрессо (50г кофе, 100мл воды) - 150 руб');
-  print('  2 - Капучино (30г кофе, 150мл молока, 100мл воды) - 200 руб');
-  print('  3 - Латте (30г кофе, 200мл молока, 100мл воды) - 250 руб');
-  print('  4 - Американо (40г кофе, 150мл воды) - 180 руб');
+  print('  1 - Эспрессо (50г кофе, 100мл воды) - 150 руб (без молока)');
+  print('  2 - Капучино (30г кофе, 150мл молока, 100мл воды) - 200 руб (с молоком)');
+  print('  3 - Латте (30г кофе, 200мл молока, 100мл воды) - 250 руб (с молоком)');
+  print('  4 - Американо (40г кофе, 150мл воды) - 180 руб (без молока)');
   
   stdout.write('Выберите (1-4): ');
   String choice = stdin.readLineSync() ?? '';
@@ -114,6 +114,6 @@ void _makeCoffee(Machine machine) {
       return;
   }
   
-  machine.makeCoffeeByType(type);
+  await machine.makeCoffeeByType(type);
   machine.showResources();
 }
