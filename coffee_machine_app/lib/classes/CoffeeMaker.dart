@@ -1,58 +1,75 @@
 import 'dart:async';
 
 class CoffeeMaker {
-
+  
+  // Callback для отправки сообщений в GUI
+  final Function(String message)? onProgress;
+  
+  CoffeeMaker({this.onProgress});
+  
+  // Метод для нагрева воды (задержка 3 секунды)
   Future<void> heatWater() async {
-    print('Начинаем нагрев воды...');
-    await Future.delayed(Duration(seconds: 3));
-    print('Вода нагрета до 95°C');
+    onProgress?.call('Начинаем нагрев воды...');
+    await Future.delayed(const Duration(seconds: 3));
+    onProgress?.call('Вода нагрета до 95°C');
   }
   
+  // Метод для заваривания кофе (после нагрева воды, задержка 5 секунд)
   Future<void> brewCoffee() async {
-    print('Завариваем кофе...');
-    await Future.delayed(Duration(seconds: 5));
-    print('Кофе заварен');
+    onProgress?.call('Завариваем кофе...');
+    await Future.delayed(const Duration(seconds: 5));
+    onProgress?.call('Кофе заварен');
   }
   
+  // Метод для взбивания молока (запускается вместе с завариванием кофе, задержка 5 секунд)
   Future<void> frothMilk() async {
-    print('Взбиваем молоко...');
-    await Future.delayed(Duration(seconds: 5));
-    print('Молоко взбито');
+    onProgress?.call('Взбиваем молоко...');
+    await Future.delayed(const Duration(seconds: 5));
+    onProgress?.call('Молоко взбито');
   }
   
+  // Метод для смешивания кофе и молока (после приготовления кофе и молока, задержка 3 секунды)
   Future<void> mixCoffeeAndMilk() async {
-    print('Смешиваем кофе с молоком...');
-    await Future.delayed(Duration(seconds: 3));
-    print('Напиток смешан');
+    onProgress?.call('Смешиваем кофе с молоком...');
+    await Future.delayed(const Duration(seconds: 3));
+    onProgress?.call('Напиток смешан');
   }
   
+  // Асинхронный метод для приготовления кофе без молока (эспрессо, американо)
   Future<void> makeCoffeeWithoutMilk() async {
-    print('\n=== Начинаем приготовление кофе без молока ===');
+    onProgress?.call('\n=== Начинаем приготовление кофе без молока ===');
     
+    // Нагрев воды
     await heatWater();
     
+    // Заваривание кофе
     await brewCoffee();
     
-    print('\nКофе готов! Приятного аппетита!\n');
+    onProgress?.call('Кофе готов! Приятного аппетита!');
   }
   
+  // Асинхронный метод для приготовления кофе с молоком (капучино, латте)
   Future<void> makeCoffeeWithMilk() async {
-    print('\n=== Начинаем приготовление кофе с молоком ===');
+    onProgress?.call('=== Начинаем приготовление кофе с молоком ===');
     
+    // Нагрев воды
     await heatWater();
-
+    
+    // Заваривание кофе и взбивание молока параллельно
     await Future.wait([
       brewCoffee(),
       frothMilk(),
     ]);
     
+    // Смешивание кофе и молока
     await mixCoffeeAndMilk();
     
-    print('\nКофе с молоком готов! Приятного аппетита!\n');
+    onProgress?.call('Кофе с молоком готов! Приятного аппетита!');
   }
   
-  static Future<void> prepareCoffee(bool hasMilk) async {
-    final coffeeMaker = CoffeeMaker();
+  // Фабричный метод для создания кофе с асинхронным приготовлением
+  static Future<void> prepareCoffee(bool hasMilk, Function(String message) onProgress) async {
+    final coffeeMaker = CoffeeMaker(onProgress: onProgress);
     
     if (hasMilk) {
       await coffeeMaker.makeCoffeeWithMilk();
