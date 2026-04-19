@@ -26,7 +26,6 @@ class Machine {
         print('Неизвестный тип ресурса');
         return;
     }
-    print('Добавлено $amount $resourceType');
   }
 
   Future<void> makeCoffeeByType(CoffeeType type) async {
@@ -63,35 +62,16 @@ class Machine {
 
   Future<void> makeCoffee(ICoffee coffee, bool hasMilk) async {
     if (isAvailableResources(coffee)) {
-      print('\nРесурсы для приготовления:');
-      print('  - Кофе: ${coffee.coffeeBeans()} гр');
-      print('  - Молоко: ${coffee.milk()} мл');
-      print('  - Вода: ${coffee.water()} мл');
-      print('  - Стоимость: ${coffee.cash()} руб');
-      
+      // Асинхронное приготовление
       await CoffeeMaker.prepareCoffee(hasMilk);
       
+      // Списание ресурсов
       resources.coffeeBeans -= coffee.coffeeBeans();
       resources.milk -= coffee.milk();
       resources.water -= coffee.water();
       resources.cash += coffee.cash();
-      
-      print('С вашего счета списано: ${coffee.cash()} руб\n');
     } else {
-      print('\nНедостаточно ресурсов!');
-      print('Требуется:');
-      print('  - Кофе: ${coffee.coffeeBeans()} гр (доступно: ${resources.coffeeBeans} гр)');
-      print('  - Молоко: ${coffee.milk()} мл (доступно: ${resources.milk} мл)');
-      print('  - Вода: ${coffee.water()} мл (доступно: ${resources.water} мл)');
+      throw Exception('Недостаточно ресурсов');
     }
-  }
-
-  void showResources() {
-    print('\n--- Текущие ресурсы машины ---');
-    print('Кофе: ${resources.coffeeBeans} гр');
-    print('Молоко: ${resources.milk} мл');
-    print('Вода: ${resources.water} мл');
-    print('Деньги: ${resources.cash} руб');
-    print('--------------------------------');
   }
 }
